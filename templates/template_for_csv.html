@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>{{.FileName}}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css">
+</head>
+<body class="">
+<div class="container-fluid">
+    <h1>{{.FileName}}</h1>
+    <table class="table table-striped table-dark">
+        <thead>
+        <tr colspan={{.CountHeaders}}>
+            {{range $headers := .Headers}}
+            <th>{{$header}}</th>
+            {{end}}
+        </tr>
+
+        {{range .Data}}
+        <tr colspan={{.CountHeaders}}>
+            <td>{{.Name}}</td>
+            <td>{{.Address}}</td>
+            <td>{{.Postcode}}</td>
+            <td>{{.Mobile}}</td>
+            <td>{{.Limit}}</td>
+            <td>{{.Birthday}}</td>
+        </tr>
+
+    </table>
+</div>
+</body>
+</html>
