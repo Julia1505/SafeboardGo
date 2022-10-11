@@ -94,30 +94,24 @@ func parseRecord(row string, index []int) *people.PeopleData {
 		prev = sim
 		word = append(word, sim)
 	}
-	//fmt.Println(res)
-	//fmt.Println(res[0])
-	//fmt.Println(res[1])
-	//fmt.Println(res[2])
-	//fmt.Println(res[3])
-	//fmt.Println(res[4])
-	//fmt.Println(res[5])
 
 	newPeople := &people.PeopleData{Name: res[0], Address: res[1], Postcode: res[2], Mobile: res[3], Limit: res[4], Birthday: res[5]}
 
 	return newPeople
 }
 
-func (p *PRNParser) Parse(in <-chan string) (*people.DataForTemplate, error) {
+func (p *PRNParser) Parse(in <-chan string) ([]string, []people.PeopleData, error) {
 
 	isHeader := true
 	var indexHeader []int
-	dataForTemp := &people.DataForTemplate{Data: make([]people.PeopleData, 0, 5), Headers: make([]string, 0, 6)}
+	data := make([]people.PeopleData, 0, 5)
+	headers := make([]string, 0, 6)
 
 	for record := range in {
 		if isHeader {
-			dataForTemp.Headers, indexHeader = parseHeader(record)
-			if len(dataForTemp.Headers) != 6 {
-				return nil, BadFormatFile
+			headers, indexHeader = parseHeader(record)
+			if len(headers) != 6 {
+				return nil, nil, BadFormatFile
 			}
 
 			isHeader = false
@@ -126,8 +120,8 @@ func (p *PRNParser) Parse(in <-chan string) (*people.DataForTemplate, error) {
 			if newPeople == nil {
 				continue
 			}
-			dataForTemp.Data = append(dataForTemp.Data, *newPeople)
+			data = append(data, *newPeople)
 		}
 	}
-	return dataForTemp, nil
+	return headers, data, nil
 }

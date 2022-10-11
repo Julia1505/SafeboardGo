@@ -45,17 +45,18 @@ func splitByColumns(row string) []string {
 	return res
 }
 
-func (p *CSVParser) Parse(in <-chan string) (*people.DataForTemplate, error) {
-	dataTemp := &people.DataForTemplate{Headers: make([]string, 0, 6), Data: make([]people.PeopleData, 0, 5)}
+func (p *CSVParser) Parse(in <-chan string) ([]string, []people.PeopleData, error) {
+	data := make([]people.PeopleData, 0, 5)
+	headers := make([]string, 0, 6)
 	isHeader := true
 	for record := range in {
 		rows := splitByColumns(record)
 		if len(rows) != 6 {
-			return nil, BadFormatFile
+			return nil, nil, BadFormatFile
 		}
 
 		if isHeader {
-			dataTemp.Headers = rows
+			headers = rows
 			isHeader = false
 		} else {
 			newPeople := &people.PeopleData{
@@ -66,8 +67,8 @@ func (p *CSVParser) Parse(in <-chan string) (*people.DataForTemplate, error) {
 				Limit:    rows[4],
 				Birthday: rows[5],
 			}
-			dataTemp.Data = append(dataTemp.Data, *newPeople)
+			data = append(data, *newPeople)
 		}
 	}
-	return dataTemp, nil
+	return headers, data, nil
 }

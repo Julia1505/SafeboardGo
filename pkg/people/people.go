@@ -1,13 +1,18 @@
 package people
 
+import (
+	"github.com/Julia1505/SafeboardGo/pkg/file"
+	"html/template"
+	"os"
+)
+
 type PeopleData struct {
-	//Id       uint
-	Name     string `csv:"Name"`
-	Address  string `csv:"Address"`
-	Postcode string `csv:"Postcode"`
-	Mobile   string `csv:"Mobile"`
-	Limit    string `csv:"Limit"`
-	Birthday string `csv:"Birthday"`
+	Name     string
+	Address  string
+	Postcode string
+	Mobile   string
+	Limit    string
+	Birthday string
 }
 
 type DataForTemplate struct {
@@ -16,4 +21,30 @@ type DataForTemplate struct {
 	Headers     []string
 	Data        []PeopleData
 	Count       int
+}
+
+func NewTemplate(filename string) *DataForTemplate {
+	return &DataForTemplate{
+		OldFileName: filename,
+		FileName:    file.NewFileName(filename),
+	}
+}
+
+type CreatorHTML struct {
+	TemplateModel interface{}
+}
+
+func (b *CreatorHTML) Create(prefix, tempFile, newFile string) error {
+	file, err := os.Create(prefix + newFile)
+	defer file.Close()
+	if err != nil {
+		return err
+	}
+
+	temp := template.Must(template.New(tempFile).ParseFiles("./templates/" + tempFile))
+	err = temp.Execute(file, b.TemplateModel)
+	if err != nil {
+		return err
+	}
+	return nil
 }

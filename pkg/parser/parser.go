@@ -17,7 +17,7 @@ var (
 
 type Parser interface {
 	GetType() string
-	Parse(in <-chan string) (*people.DataForTemplate, error)
+	Parse(in <-chan string) ([]string, []people.PeopleData, error)
 }
 
 func NewParser(typeParser string) (Parser, error) {
