@@ -16,4 +16,5 @@ build: vet
 	go build -o bin/safeboard cmd/safeboard/main.go
 .PHONY:build
 
-
+run: build
+	./bin/safeboard

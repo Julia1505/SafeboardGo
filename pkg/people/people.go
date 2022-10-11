@@ -11,7 +11,9 @@ type PeopleData struct {
 }
 
 type DataForTemplate struct {
-	FileName string
-	Headers  []string
-	Data     []PeopleData
+	OldFileName string
+	FileName    string
+	Headers     []string
+	Data        []PeopleData
+	Count       int
 }
