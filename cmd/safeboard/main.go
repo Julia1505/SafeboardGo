@@ -1,20 +1,17 @@
 package main
 
 import (
-	"encoding/csv"
 	"fmt"
+	"github.com/Julia1505/SafeboardGo/pkg/decoder"
 	_ "github.com/Julia1505/SafeboardGo/pkg/people"
 	"os"
 	"sync"
 )
 
-//func MakePeopleData(record []string) (people.PeopleData, error) {
-//	if len(record) !=
-//}
-
 func main() {
 	prefix := "./data/"
-	filename := prefix + "data.csv"
+	filename := prefix + "data.prn"
+
 	file, err := os.Open(filename)
 	if err != nil {
 		fmt.Printf("error:%v\n", err)
@@ -22,33 +19,62 @@ func main() {
 	}
 	defer file.Close()
 
-	reader := csv.NewReader(file)
-	//var data []people.PeopleData
-
-	transport := make(chan []string)
 	wg := &sync.WaitGroup{}
-	wg.Add(2)
 
-	go func() {
-		defer close(transport)
-		defer wg.Done()
-
-		for {
-			record, err := reader.Read()
-			if err != nil {
-				break
-			}
-			fmt.Println(record)
-			//transport <- record
-		}
-	}()
+	transport := make(chan string)
+	wg.Add(1)
+	fileDecoder, err := decoder.NewDecoder("ISO8859_1")
+	if err != nil {
+		fmt.Printf("error happened: %v", err)
+		return
+	}
 
 	go func() {
 		defer wg.Done()
-		for record := range transport {
-
-		}
+		fileDecoder.Decode(file, transport)
 	}()
+
+	//parserFile, err := parser.NewParser("csv")
+	//if err != nil {
+	//	fmt.Printf("error happened: %v", err)
+	//	return
+	//}
+	//
+	//var dataForTemp people.DataForTemplate
+	//go func() {
+	//	defer wg.Done()
+	//	dataForTemp, err = parserFile.Parse(transport)
+	//	if err != nil {
+	//		fmt.Printf("error happened: %v", err)
+	//		return
+	//	}
+	//
+	//}()
+	//fmt.Println(dataForTemp)
+	for elem := range transport {
+		fmt.Println(elem)
+	}
 
 	wg.Wait()
+
+	//newFile, err := os.Create(prefix + "newFile.html")
+	//if err != nil {
+	//	fmt.Printf("error:%v\n", err)
+	//	return
+	//}
+	//
+	//temp, err := template.New("").ParseFiles("./templates/template_for_csv.html")
+	//temp = template.Must(template.New("template_for_csv.html").ParseFiles("./templates/template_for_csv.html"))
+	//if err != nil {
+	//	fmt.Printf("error: %v\n", err)
+	//	return
+	//}
+	////
+	////fmt.Println(dataForTemp)
+	//err = temp.Execute(newFile, dataForTemp)
+	//if err != nil {
+	//	fmt.Printf("error: %v\n", err)
+	//	return
+	//}
+
 }
