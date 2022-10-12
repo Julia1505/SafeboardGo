@@ -14,7 +14,7 @@ func reverse(s string) string {
 	return string(runes)
 }
 
-func FileExtension(filename string) (string, error) {
+func GetFileExtension(filename string) (string, error) {
 	runeString := []rune(filename)
 	l := len(runeString)
 	ext := ""
@@ -33,7 +33,7 @@ func FileExtension(filename string) (string, error) {
 	return ext, nil
 }
 
-func NewFileName(filename string) string {
+func NewFileExtension(filename, ext string) string {
 	runeString := []rune(filename)
 	l := len(runeString)
 	var ind int
@@ -45,7 +45,6 @@ func NewFileName(filename string) string {
 	}
 
 	runeString = runeString[:ind+1]
-	res := string(runeString) + "html"
-
+	res := string(runeString) + ext
 	return res
 }

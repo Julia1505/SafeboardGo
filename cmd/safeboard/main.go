@@ -18,7 +18,7 @@ var (
 func main() {
 	prefix := "./data/"
 	filename := "data.csv"
-	typeFile, err := file.FileExtension(filename)
+	typeFile, err := file.GetFileExtension(filename)
 	if err != nil {
 		fmt.Printf("error:%v\n", err)
 		return
@@ -62,7 +62,6 @@ func main() {
 			fmt.Printf("error happened: %v", err)
 			return
 		}
-
 	}()
 
 	wg.Wait()

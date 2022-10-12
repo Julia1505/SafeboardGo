@@ -18,3 +18,12 @@ build: vet
 
 run: build
 	./bin/safeboard
+
+test: build
+	go test -v
+.PHONY:test
+
+coverage:build
+	go test -coverprofile=cover.out
+	go tool cover -html=cover.out -o cover.html
+.PHONY:coverage
