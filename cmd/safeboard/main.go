@@ -65,6 +65,7 @@ func main() {
 	}()
 
 	wg.Wait()
+	fmt.Println(data)
 
 	dataForTemp := people.NewTemplate(filename)
 	dataForTemp.Count = len(headers)

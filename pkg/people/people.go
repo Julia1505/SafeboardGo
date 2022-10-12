@@ -26,7 +26,7 @@ type DataForTemplate struct {
 func NewTemplate(filename string) *DataForTemplate {
 	return &DataForTemplate{
 		OldFileName: filename,
-		FileName:    file.NewFileName(filename),
+		FileName:    file.NewFileExtension(filename, "html"),
 	}
 }
 
