@@ -7,17 +7,15 @@ import (
 	"github.com/Julia1505/SafeboardGo/pkg/parser"
 	"github.com/Julia1505/SafeboardGo/pkg/people"
 	"os"
-	"sync"
-)
-
-var (
-	CSVFile = "csv"
-	PRNFile = "prn"
 )
 
 func main() {
+	filename := "data.csv" // этот файл конвертируется
+
 	prefix := "./data/"
-	filename := "data.csv"
+	//var filename string
+	//fmt.Scan(&filename)
+
 	typeFile, err := file.GetFileExtension(filename)
 	if err != nil {
 		fmt.Printf("error:%v\n", err)
@@ -38,12 +36,8 @@ func main() {
 		return
 	}
 
-	wg := &sync.WaitGroup{}
 	transport := make(chan string)
-	wg.Add(2)
-
 	go func() {
-		defer wg.Done()
 		fileDecoder.Decode(file, transport)
 	}()
 
@@ -53,27 +47,38 @@ func main() {
 		return
 	}
 
-	var headers []string
-	var data []people.PeopleData
+	parseCh := make(chan []string)
 	go func() {
-		defer wg.Done()
-		headers, data, err = parserFile.Parse(transport)
+		defer close(parseCh)
+		err = parserFile.Parse(transport, parseCh)
 		if err != nil {
 			fmt.Printf("error happened: %v", err)
 			return
 		}
 	}()
 
-	wg.Wait()
-	fmt.Println(data)
-
 	dataForTemp := people.NewTemplate(filename)
-	dataForTemp.Count = len(headers)
-	dataForTemp.Data = data
-	dataForTemp.Headers = headers
+	isHeader := true
+	for elem := range parseCh {
+		if isHeader {
+			dataForTemp.Headers = elem
+			dataForTemp.Count = len(elem)
+			isHeader = false
+		} else {
+			dataForTemp.Data = append(dataForTemp.Data, people.PeopleData{
+				Name:     elem[0],
+				Address:  elem[1],
+				Postcode: elem[2],
+				Mobile:   elem[3],
+				Limit:    elem[4],
+				Birthday: elem[5],
+			})
+		}
+	}
+	//fmt.Println(dataForTemp.Data)
 
 	creatorHTML := &people.CreatorHTML{TemplateModel: dataForTemp}
-	err = creatorHTML.Create(prefix, "template_for_csv.html", dataForTemp.FileName)
+	err = creatorHTML.Create(prefix, "template.html", dataForTemp.FileName)
 	if err != nil {
 		fmt.Printf("error happend: %v", err)
 		return

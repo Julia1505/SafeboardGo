@@ -10,21 +10,21 @@
     </style>
 </head>
 <nav class="navbar navbar-dark bg-dark">
-    <h3 c>{{.OldFileName}} to {{.FileName}}</h3>
+    <h3 >{{.OldFileName}} to {{.FileName}}</h3>
 </nav>
 <body class="">
 <div class="container-fluid">
 
     <table class="table table-hover table-striped">
         <thead>
-        <tr colspan=6>
+        <tr colspan="{{.Count}}">
             {{range $header := .Headers}}
             <th scope="col">{{$header}}</th>
             {{end}}
         </tr>
         </thead>
         {{range $i,$val := .Data}}
-        <tr colspan=6>
+        <tr>
             <td >{{.Name}}</td>
             <td>{{.Address}}</td>
             <td>{{.Postcode}}</td>

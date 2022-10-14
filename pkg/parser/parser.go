@@ -2,7 +2,6 @@ package parser
 
 import (
 	"errors"
-	"github.com/Julia1505/SafeboardGo/pkg/people"
 )
 
 var (
@@ -17,7 +16,7 @@ var (
 
 type Parser interface {
 	GetType() string
-	Parse(in <-chan string) ([]string, []people.PeopleData, error)
+	Parse(in <-chan string, out chan<- []string) error
 }
 
 func NewParser(typeParser string) (Parser, error) {

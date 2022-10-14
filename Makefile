@@ -1,29 +1,31 @@
 .DEFAULT_GOAL := run
 
-fmt:
+fmt: deps
 	go fmt ./...
-.PHONY:fmt
+.PHONY:fmt lint vet clean build test coverage run
 
 lint: fmt
 	glint ./...
-.PHONY:lint
 
 vet: fmt
 	go vet ./...
-.PHONY:vet
 
-build: vet
+clean:
+	rm -rf ./bin/safeboard ./pkg/*/*.out ./pkg/*.out ./*.out
+
+build: vet clean
 	go build -o bin/safeboard cmd/safeboard/main.go
-.PHONY:build
 
 run: build
 	./bin/safeboard
 
 test: build
-	go test -v
-.PHONY:test
+	go test -v ./pkg/decoder ./pkg/file ./pkg/parser
 
 coverage:build
-	go test -coverprofile=cover.out
+	go test -coverprofile=cover.out ./pkg/decoder ./pkg/file ./pkg/parser
 	go tool cover -html=cover.out -o cover.html
-.PHONY:coverage
+
+deps:
+	go get ./cmd/safeboard ./pkg/*
+

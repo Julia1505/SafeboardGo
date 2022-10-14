@@ -27,6 +27,7 @@ func NewTemplate(filename string) *DataForTemplate {
 	return &DataForTemplate{
 		OldFileName: filename,
 		FileName:    file.NewFileExtension(filename, "html"),
+		Data:        make([]PeopleData, 0, 5),
 	}
 }
 

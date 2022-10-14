@@ -1,9 +1,5 @@
 package parser
 
-import (
-	"github.com/Julia1505/SafeboardGo/pkg/people"
-)
-
 type CSVParser struct {
 	typePar string
 }
@@ -45,30 +41,27 @@ func splitByColumns(row string) []string {
 	return res
 }
 
-func (p *CSVParser) Parse(in <-chan string) ([]string, []people.PeopleData, error) {
-	data := make([]people.PeopleData, 0, 5)
+func (p *CSVParser) Parse(in <-chan string, out chan<- []string) error {
 	headers := make([]string, 0, 6)
 	isHeader := true
+	var cols int
 	for record := range in {
 		rows := splitByColumns(record)
-		if len(rows) != 6 {
-			return nil, nil, BadFormatFile
+		if isHeader {
+			cols = len(rows)
+		}
+
+		if len(rows) != cols {
+			return BadFormatFile
 		}
 
 		if isHeader {
 			headers = rows
 			isHeader = false
+			out <- headers
 		} else {
-			newPeople := &people.PeopleData{
-				Name:     rows[0],
-				Address:  rows[1],
-				Postcode: rows[2],
-				Mobile:   rows[3],
-				Limit:    rows[4],
-				Birthday: rows[5],
-			}
-			data = append(data, *newPeople)
+			out <- rows
 		}
 	}
-	return headers, data, nil
+	return nil
 }

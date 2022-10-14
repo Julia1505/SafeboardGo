@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"github.com/Julia1505/SafeboardGo/pkg/people"
 	"unicode"
 )
 
@@ -55,7 +54,7 @@ func parseHeader(row string) ([]string, []int) {
 	return res, index
 }
 
-func parseRecord(row string, index []int) *people.PeopleData {
+func parseRecord(row string, index []int) []string {
 	res := make([]string, 0, 6)
 	word := make([]rune, 0, 10)
 	prev := ' '
@@ -95,33 +94,34 @@ func parseRecord(row string, index []int) *people.PeopleData {
 		word = append(word, sim)
 	}
 
-	newPeople := &people.PeopleData{Name: res[0], Address: res[1], Postcode: res[2], Mobile: res[3], Limit: res[4], Birthday: res[5]}
-
-	return newPeople
+	return res
 }
 
-func (p *PRNParser) Parse(in <-chan string) ([]string, []people.PeopleData, error) {
-
+func (p *PRNParser) Parse(in <-chan string, out chan<- []string) error {
 	isHeader := true
 	var indexHeader []int
-	data := make([]people.PeopleData, 0, 5)
 	headers := make([]string, 0, 6)
+	var cols int
 
 	for record := range in {
 		if isHeader {
 			headers, indexHeader = parseHeader(record)
-			if len(headers) != 6 {
-				return nil, nil, BadFormatFile
+			if len(headers) <= 0 {
+				return BadFormatFile
 			}
-
+			cols = len(headers)
+			out <- headers
 			isHeader = false
 		} else {
-			newPeople := parseRecord(record, indexHeader)
-			if newPeople == nil {
+			data := parseRecord(record, indexHeader)
+			if data == nil {
 				continue
 			}
-			data = append(data, *newPeople)
+			if len(data) != cols {
+				return BadFormatFile
+			}
+			out <- data
 		}
 	}
-	return headers, data, nil
+	return nil
 }
